@@ -1,0 +1,48 @@
+# Secrets and local credentials
+.env
+.env.*
+!.env.example
+*.pem
+kubeconfig
+*.kubeconfig
+
+# Terraform
+.terraform/
+*.tfstate
+*.tfstate.*
+*.tfvars
+!*.tfvars.example
+.terraform.tfstate.lock.info
+crash.log
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# Node / Next.js (workloads/apps)
+node_modules/
+.next/
+out/
+dist/
+build/
+*.tsbuildinfo
+.npm
+.eslintcache
+
+# Python (optional tooling)
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# OS and editors
+.DS_Store
+Thumbs.db
+.idea/
+*.swp
+*.swo
+*~
+
+# LocalStack / compose runtime data (if generated beside repo)
+localstack-data/
+volume/
