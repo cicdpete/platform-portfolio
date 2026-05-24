@@ -33,12 +33,19 @@ kubectl get pods -n argocd
 # (TBD) argocd admin initial-password -n argocd
 ```
 
-## 4. Sync platform, then workloads
+## 4. Sync AppProjects and both roots
+
+Two **sibling** app-of-apps roots (`platform-root`, `workloads-root`)—not one monolithic `gitops-root`. See [ADR 0002](../adr/0002-argocd-roots-and-guardrails.md).
 
 ```bash
-# (TBD) Register repo / apply app-of-apps from platform/argocd/
-# (TBD) argocd app sync ...
+# (TBD) Apply AppProjects from platform/argocd/projects/
+# (TBD) Apply or sync platform-root → platform apps (ingress, cert-manager, …)
+# (TBD) Apply or sync workloads-root → workloads/argocd/
+# (TBD) argocd app sync platform-root
+# (TBD) argocd app sync workloads-root
 ```
+
+Avoid **Cascade** delete on root Applications in the Argo UI.
 
 ## 5. Application image — local fast path
 

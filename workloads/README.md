@@ -14,8 +14,10 @@ workloads/
 ├── apps/
 │   └── hello-next/     # Next.js app + Dockerfile (TBD)
 ├── charts/             # optional shared Helm library
-└── argocd/             # Application manifests per app
+└── argocd/             # Application manifests (synced by workloads-root)
 ```
+
+GitOps entry point: **`workloads-root`** (sibling of `platform-root`) — see [ADR 0002](../docs/adr/0002-argocd-roots-and-guardrails.md) and [workloads/argocd/README.md](argocd/README.md).
 
 ## Images
 
@@ -25,7 +27,7 @@ workloads/
 | **Local dev** | `docker build` + `minikube image load` (or `minikube docker-env`) → `hello-next:local` |
 | **Deploy** | Manifests reference GHCR tag after CI; local override documented in [local golden path](../docs/runbooks/local-golden-path.md) |
 
-Production analogy: ECR in AWS; this repo uses GHCR locally/CI to avoid cost and LocalStack ECR friction.
+Production analogy: ECR (or any registry) in real AWS; this repo uses **GHCR** for CI and local load for dev.
 
 ## CI pipelines
 

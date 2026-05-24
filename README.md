@@ -6,7 +6,7 @@ End-to-end **platform / SRE portfolio**: optional AWS-shaped IaC → **Minikube*
 
 **Remote:** [github.com/cicdpete/platform-portfolio](https://github.com/cicdpete/platform-portfolio)
 
-**Architecture decisions:** [docs/adr/0001-local-dev-stack.md](docs/adr/0001-local-dev-stack.md)  
+**Architecture decisions:** [ADR 0001](docs/adr/0001-local-dev-stack.md) (local stack) · [ADR 0002](docs/adr/0002-argocd-roots-and-guardrails.md) (Argo roots & guardrails)  
 **Local runbook:** [docs/runbooks/local-golden-path.md](docs/runbooks/local-golden-path.md)
 
 ## Problem statement
@@ -32,14 +32,18 @@ flowchart TB
 
   subgraph gitops["GitOps on Minikube"]
     ARGO["Argo CD"]
+    PROOT["platform-root"]
+    WROOT["workloads-root"]
     PLAT["platform/ — ingress, certs, …"]
     APP["workloads/ — Next.js"]
-    ARGO --> PLAT
-    ARGO --> APP
+    ARGO --> PROOT
+    ARGO --> WROOT
+    PROOT --> PLAT
+    WROOT --> APP
   end
 
   subgraph optional["Optional later"]
-    LS["iac/localstack — IAM, S3, ECR APIs"]
+    LS["iac/localstack — IAM, S3 APIs"]
   end
 
   TF --> ARGO
@@ -53,19 +57,19 @@ flowchart TB
 | Path | Responsibility |
 |------|----------------|
 | [`iac/`](iac/) | **Bootstrap:** Terraform installs Argo CD on Minikube. **Optional:** LocalStack-backed AWS resources (IAM, S3)—not Minikube/EKS provisioning in v1. |
-| [`platform/`](platform/) | **GitOps:** Argo CD Applications for shared cluster services (ingress, certs, observability, app-of-apps root). |
+| [`platform/`](platform/) | **GitOps:** AppProjects, **`platform-root`** + **`workloads-root`**, platform child apps (ingress, certs, observability). |
 | [`workloads/`](workloads/) | **Product:** Next.js app, Helm/Kustomize, Argo `Application` manifests. |
 | [`docs/`](docs/) | ADRs, runbooks, destroy checklist. |
 | [`.github/workflows/`](.github/workflows/) | CI at **repo root** only (not under `workloads/apps/*/.github/`); `paths` filters per app. |
 
-**Flow:** `minikube start` → `iac/bootstrap` (Argo install) → Argo syncs `platform/` → Argo syncs `workloads/`. CI pushes images to GHCR and updates tags in git; Argo deploys on the cluster you run locally.
+**Flow:** `minikube start` → `iac/bootstrap` (Argo install) → sync **`platform-root`** and **`workloads-root`** (siblings; see [ADR 0002](docs/adr/0002-argocd-roots-and-guardrails.md)). CI pushes images to GHCR and updates tags in git; Argo deploys on the cluster you run locally.
 
 ## Stack
 
 | Layer | Choice | Notes |
 |-------|--------|--------|
 | Kubernetes | **Minikube** | Local cluster; created via runbook, not Terraform v1 |
-| AWS (optional) | **LocalStack** | IAM/S3/ECR *API* demos in `iac/localstack/` (later); not required for app MVP |
+| AWS (optional) | **LocalStack** | IAM/S3 API demos in `iac/localstack/` (later); not required for app MVP |
 | IaC | **Terraform** | `kubernetes` / `helm` for Argo bootstrap; optional `aws` provider → LocalStack |
 | GitOps | **Argo CD** | Bootstrap in `iac/`; ongoing config in `platform/` + `workloads/` |
 | Registry (CI) | **GHCR** | `ghcr.io`; public package + public repo → no Actions secrets for MVP |
@@ -96,8 +100,9 @@ minikube start
 # One-time Argo CD install
 # cd iac/bootstrap && terraform init && terraform apply
 
-# GitOps sync (Argo CLI / UI — see platform/)
-# argocd app sync ...
+# GitOps: sync platform-root and workloads-root (see platform/argocd/)
+# argocd app sync platform-root
+# argocd app sync workloads-root
 
 # Local app image (optional while developing)
 # docker build -t hello-next:local ./workloads/apps/hello-next

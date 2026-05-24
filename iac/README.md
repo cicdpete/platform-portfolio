@@ -9,7 +9,7 @@ See [ADR 0001: Local development stack](../docs/adr/0001-local-dev-stack.md).
 | In scope (`iac/`) | Out of scope (elsewhere) |
 |-------------------|---------------------------|
 | Terraform **installs Argo CD** on an existing cluster (`bootstrap/`) | Minikube creation → runbook / `minikube start` |
-| Optional LocalStack: IAM, S3, ECR **repository** resources (`localstack/`, later) | Ongoing Argo `Application` manifests → `platform/`, `workloads/` |
+| Optional LocalStack: IAM, S3 (`localstack/`, later) | Ongoing Argo `Application` manifests → `platform/`, `workloads/` |
 | Helm/kubernetes providers, local Terraform state for bootstrap | Next.js app source → `workloads/apps/` |
 | | Application image build/push → GitHub Actions → GHCR |
 
@@ -40,7 +40,7 @@ For portfolio narrative (“IAM policy allows S3 read”, etc.):
 
 - Run LocalStack via compose or CLI (documented in runbooks when added).
 - Terraform `aws` provider with `endpoints` / `skip_*` aimed at `http://localhost:4566`.
-- **ECR:** creating repos via API is fine; **do not** depend on host `docker push` to LocalStack ECR for the Next.js MVP—use GHCR in CI and `minikube image load` locally.
+- **Images:** GHCR (CI) and `minikube image load` (local)—out of scope for this slice.
 
 ## State and secrets
 

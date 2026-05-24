@@ -27,6 +27,7 @@ This repository is a **portfolio** project: reviewers should clone it, follow on
 - **Argo CD** runs on Minikube and owns ongoing config for `platform/` and `workloads/`.
 - **Terraform** in `iac/bootstrap/` performs a **one-time** install of Argo CD (`kubernetes` / `helm` providers).
 - **Argo Application manifests** live under `platform/` and `workloads/`; Terraform must not fight GitOps for the same resources.
+- **Two app-of-apps roots** (`platform-root`, `workloads-root`) and **AppProject** guardrails — see [ADR 0002](0002-argocd-roots-and-guardrails.md).
 
 ### Application: Next.js hello world
 
@@ -41,14 +42,13 @@ This repository is a **portfolio** project: reviewers should clone it, follow on
 | **Local fast path** | `docker build` + `minikube image load` (or `eval $(minikube docker-env)`) | Developer iteration without registry |
 | **Cluster pull** | Minikube kubelet pulls **public** GHCR tag referenced in manifests | After CI publishes an image |
 
-- **Production analogy:** ECR (or any registry) in real AWS; locally we use GHCR for a free, reproducible CI story.
-- Do **not** block MVP on LocalStack ECR or host `docker push` to emulated ECR.
+- **Production analogy:** ECR (or any registry) in real AWS; this repo uses **GHCR** for a free, reproducible CI story (LocalStack does not emulate ECR here).
 
 ### Optional AWS emulation: LocalStack
 
-- **LocalStack** (optional) for Terraform against AWS APIs: IAM policies, S3 buckets, ECR **repository resources**, etc.
+- **LocalStack** (optional) for Terraform against AWS APIs: **IAM** policies, **S3** buckets, etc.
 - **Not** on the critical path for serving the Next.js app in v1.
-- **ECR:** API emulation may exist; reliable host `docker push` often requires LocalStack auth/tier and extra ports—defer to a later slice. See [LocalStack ECR docs](https://docs.localstack.cloud/aws/services/ecr/).
+- **Out of scope for LocalStack in this repo:** ECR/image registry emulation—images use GHCR per above.
 
 ### CI/CD: GitHub Actions
 
@@ -62,7 +62,7 @@ This repository is a **portfolio** project: reviewers should clone it, follow on
 ### IaC layout
 
 - `iac/bootstrap/` — Terraform installs Argo CD on existing Minikube context.
-- `iac/localstack/` (optional, later) — Terraform + LocalStack for IAM/S3/ECR resource demos.
+- `iac/localstack/` (optional, later) — Terraform + LocalStack for IAM/S3 demos.
 - **Not in v1:** VPC, EKS, real AWS credentials in CI.
 
 ### Cost
