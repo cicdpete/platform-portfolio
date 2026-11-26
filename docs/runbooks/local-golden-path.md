@@ -79,7 +79,7 @@ After GitHub Actions pushes a **public** image to `ghcr.io/<owner>/hello-next:<t
 minikube delete
 ```
 
-No cloud resources to destroy for the core MVP. Stop LocalStack containers if you started them for optional IaC demos.
+No cloud resources to destroy for the core MVP. Stop **AWS Emulator** if you started it for optional M5 IaC demos.
 
 ## CI note
 

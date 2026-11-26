@@ -42,13 +42,14 @@ This repository is a **portfolio** project: reviewers should clone it, follow on
 | **Local fast path** | `docker build` + `minikube image load` (or `eval $(minikube docker-env)`) | Developer iteration without registry |
 | **Cluster pull** | Minikube kubelet pulls **public** GHCR tag referenced in manifests | After CI publishes an image |
 
-- **Production analogy:** ECR (or any registry) in real AWS; this repo uses **GHCR** for a free, reproducible CI story (LocalStack does not emulate ECR here).
+- **Production analogy:** ECR (or any registry) in real AWS; this repo uses **GHCR** for a free, reproducible CI story (no local registry emulation).
 
-### Optional AWS emulation: LocalStack
+### Optional AWS emulation: AWS Emulator
 
-- **LocalStack** (optional) for Terraform against AWS APIs: **IAM** policies, **S3** buckets, etc.
+- **[AWS Emulator](https://aws.amazon.com/blogs/aws/test-your-applications-against-aws-locally-with-aws-emulator/)** (optional, **M5**) for local demos against AWS APIs: **IAM**-shaped resources, **S3**, etc.
 - **Not** on the critical path for serving the Next.js app in v1.
-- **Out of scope for LocalStack in this repo:** ECR/image registry emulation—images use GHCR per above.
+- **Out of scope here:** using the emulator as an image registry—images use GHCR per above.
+- **Limit:** do not treat emulator results as validation of real IAM or resource-based policy enforcement on AWS.
 
 ### CI/CD: GitHub Actions
 
@@ -62,12 +63,12 @@ This repository is a **portfolio** project: reviewers should clone it, follow on
 ### IaC layout
 
 - `iac/bootstrap/` — Terraform installs Argo CD on existing Minikube context.
-- `iac/localstack/` (optional, later) — Terraform + LocalStack for IAM/S3 demos.
+- `iac/aws-emulator/` (optional, **M5**) — AWS Emulator–backed IAM/S3-shaped demos.
 - **Not in v1:** VPC, EKS, real AWS credentials in CI.
 
 ### Cost
 
-- **$0** target: Minikube local, public repo Actions minutes, public GHCR, optional LocalStack free/non-commercial tier if used later.
+- **$0** target: Minikube local, public repo Actions minutes, public GHCR; optional AWS Emulator runs locally with no AWS account fee for the emulator itself.
 
 ## Consequences
 
@@ -79,7 +80,7 @@ This repository is a **portfolio** project: reviewers should clone it, follow on
 
 ### Negative / tradeoffs
 
-- LocalStack IAM is **not** demonstrated by `minikube docker-env` or image pull alone; add an explicit `iac/localstack` + small access demo later.
+- AWS Emulator IAM narrative is **not** demonstrated by `minikube docker-env` or image pull alone; add an explicit `iac/aws-emulator` + small access demo at **M5**. Emulator ≠ real IAM evaluation.
 - CI does not prove deploy to a remote cluster until a follow-up workflow or environment is added.
 - Two image paths (local load vs GHCR) must be documented to avoid confusion.
 

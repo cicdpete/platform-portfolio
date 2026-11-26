@@ -43,6 +43,7 @@ Thumbs.db
 *.swo
 *~
 
-# LocalStack / compose runtime data (if generated beside repo)
+# Local AWS emulator / compose runtime data (if generated beside repo)
 localstack-data/
+aws-emulator-data/
 volume/

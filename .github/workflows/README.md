@@ -48,7 +48,7 @@ For a **public** repo and **public** GHCR package:
 - Use built-in **`GITHUB_TOKEN`** with `packages: write` — **no custom repository secrets** required.
 - Do not deploy to a developer’s Minikube from Actions in v1; Argo on local Minikube syncs after git updates.
 
-Add secrets later only if needed: private GHCR, `ARGOCD_AUTH_TOKEN` for remote sync, LocalStack auth, real AWS.
+Add secrets later only if needed: private GHCR, `ARGOCD_AUTH_TOKEN` for remote sync, real AWS.
 
 ## What Actions does not do (v1)
 
